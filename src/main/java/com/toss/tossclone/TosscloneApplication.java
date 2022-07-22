@@ -9,5 +9,4 @@ public class TosscloneApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(TosscloneApplication.class, args);
 	}
-
 }
