@@ -2,26 +2,6 @@
 
 # 프로젝트 주제: ‘토스’ 앱의 주요 기능을 구현해보기
 
-## 메인 홈페이지
-
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/38a9a14b-cec9-4410-b6ae-2bf01ef178fa/Untitled.png)
-
-## 송금 페이지 1-1 (추천 계좌 ver)
-
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/1e2a98e5-5b35-437a-8df1-e2544b650036/Untitled.png)
-
-## 송금 페이지 1-2 (직접 은행 & 계좌 입력 ver)
-
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/1dc47127-3afb-4a5e-bd58-0817e300dea4/Untitled.png)
-
-## 송금 페이지 2
-
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/af74b0f1-bd16-4394-aa6b-a925dd649cf6/Untitled.png)
-
-## 계좌 관리 페이지
-
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/f0713df6-4549-47d1-b3c5-9f68269e8c11/Untitled.png)
-
 ## 요구사항 정리
 
 - 회원 기능 (Member)
@@ -53,3 +33,20 @@
     - 프로젝트를 진행하면서 더 추가할 예정…
 
 ## 데이터베이스 다이어그램
+
+![Untitled](img/Untitled5.png)
+
+## 메인 홈페이지
+<img src="img/Untitled.png" width="200" height="400"/>
+
+## 송금 페이지 1-1 (추천 계좌 ver)
+<img src="img/Untitled1.png" width="200" height="400"/>
+
+## 송금 페이지 1-2 (직접 은행 & 계좌 입력 ver)
+<img src="img/Untitled2.png" width="200" height="300"/>
+
+## 송금 페이지 2
+<img src="img/Untitled3.png" width="200" height="300"/>
+
+## 계좌 관리 페이지
+<img src="img/Untitled4.png" width="200" height="400"/>
