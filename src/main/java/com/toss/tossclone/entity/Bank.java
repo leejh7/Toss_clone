@@ -28,7 +28,5 @@ public class Bank {
         this.interestRate = interestRate;
     }
 
-    /**
-     * 추후에 은행 별 icon 이미지 추가 해줄것
-     */
+    // TODO: 은행 별 icon 이미지 추가 해줄것
 }

@@ -42,9 +42,8 @@ public class Member {
         this.role = role;
     }
 
-    /**
-     * 한달마다 거래 횟수 초기화
-     */
+
+    //==비지니스 로직==//
     void initTransactionCount() {
         transactionCount = 0;
     }

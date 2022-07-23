@@ -1,5 +1,7 @@
 package com.toss.tossclone.entity;
 
+import com.toss.tossclone.entity.constant.AccountRole;
+import com.toss.tossclone.exception.NotEnoughMoneyException;
 import lombok.*;
 
 import javax.persistence.*;
@@ -29,6 +31,9 @@ public class Account {
     @Column(nullable = false)
     private String password;
 
+    @Enumerated(EnumType.STRING)
+    private AccountRole accountRole;
+
     @Builder
     public Account(Member member, Bank bank, String accountCode, Long balance, String password) {
         this.member = member;
@@ -38,5 +43,15 @@ public class Account {
         this.password = password;
     }
 
+    //==비지니스 로직==//
+    public void addBalance(Long money) {this.balance += money;}
+
+    public void deductBalance(Long money) {
+        Long restBalance = this.balance - money;
+        if(restBalance < 0) {
+            throw new NotEnoughMoneyException("잔액이 부족합니다");
+        }
+        this.balance = restBalance;
+    }
 
 }
