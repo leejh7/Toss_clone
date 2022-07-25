@@ -12,17 +12,17 @@ import javax.persistence.*;
 @Getter
 @Setter(AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class AccountEvent {
+public class AccountEvent extends BaseEntity {
     @Id @GeneratedValue
-    @Column(name = "account_event_id")
+    @Column(name = "account_event_key")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "event_id")
+    @JoinColumn(name = "event_key")
     private Event event;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_id")
+    @JoinColumn(name = "account_key")
     private Account account;
 
 

@@ -9,17 +9,17 @@ import javax.persistence.*;
 @Getter
 @Setter(AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CategoryTransaction {
+public class CategoryTransaction extends BaseEntity {
     @Id @GeneratedValue
-    @Column(name = "category_transaction_id")
+    @Column(name = "category_transaction_key")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "category_key")
     private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "transaction_id")
+    @JoinColumn(name = "transaction_key")
     private Transaction transaction;
 
     @Builder

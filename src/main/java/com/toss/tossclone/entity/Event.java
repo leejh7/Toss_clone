@@ -11,13 +11,13 @@ import java.time.LocalDateTime;
 @Getter
 @Setter(AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Event {
+public class Event extends BaseEntity {
     @Id @GeneratedValue
-    @Column(name = "event_id")
+    @Column(name = "event_key")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bank_id")
+    @JoinColumn(name = "bank_key")
     private Bank bank;
 
     @Column(name = "event_detail")

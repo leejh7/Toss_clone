@@ -9,17 +9,17 @@ import javax.persistence.*;
 @Entity
 @Getter @Setter(AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Account {
+public class Account extends BaseEntity {
     @Id @GeneratedValue
-    @Column(name = "account_id")
+    @Column(name = "account_key")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member_key")
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bank_id")
+    @JoinColumn(name = "bank_key")
     private Bank bank;
 
     @Column(name = "account_code", nullable = false)

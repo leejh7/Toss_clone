@@ -11,9 +11,9 @@ import javax.persistence.Id;
 @Getter
 @Setter(AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Category {
+public class Category extends BaseEntity {
     @Id @GeneratedValue
-    @Column(name = "category_id")
+    @Column(name = "category_key")
     private Long id;
 
     @Column(name = "category_name", nullable = false)

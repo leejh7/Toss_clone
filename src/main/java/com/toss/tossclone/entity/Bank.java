@@ -10,10 +10,10 @@ import javax.persistence.Id;
 @Entity
 @Getter @Setter(AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Bank {
+public class Bank extends BaseEntity {
 
     @Id @GeneratedValue
-    @Column(name = "bank_id")
+    @Column(name = "bank_key")
     private Long id;
 
     @Column(nullable = false)
