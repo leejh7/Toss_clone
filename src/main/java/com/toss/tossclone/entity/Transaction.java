@@ -1,5 +1,6 @@
 package com.toss.tossclone.entity;
 
+import com.toss.tossclone.exception.NotEnoughMoneyException;
 import lombok.*;
 import net.bytebuddy.asm.Advice;
 
@@ -16,12 +17,18 @@ public class Transaction extends BaseEntity {
     @Column(name = "transaction_key")
     private Long id;
 
+    @Column(name = "sender_name", nullable = false)
+    private String senderName;
+
+    @Column(name = "receiver_name", nullable = false)
+    private String receiverName;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender_account_key", referencedColumnName = "account_key")
+    @JoinColumn(name = "sender_account_key", referencedColumnName = "account_key", nullable = false)
     private Account senderAccount;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "receiver_account_key", referencedColumnName = "account_key")
+    @JoinColumn(name = "receiver_account_key", referencedColumnName = "account_key", nullable = false)
     private Account receiverAccount;
 
     @Column(nullable = false)
@@ -34,7 +41,9 @@ public class Transaction extends BaseEntity {
     private String memo;
 
     @Builder
-    public Transaction(Account senderAccount, Account receiverAccount, Long amount, LocalDateTime transferTime, String memo) {
+    private Transaction(String senderName, String receiverName, Account senderAccount, Account receiverAccount, Long amount, LocalDateTime transferTime, String memo) {
+        this.senderName = senderName;
+        this.receiverName = receiverName;
         this.senderAccount = senderAccount;
         this.receiverAccount = receiverAccount;
         this.amount = amount;
@@ -43,10 +52,12 @@ public class Transaction extends BaseEntity {
     }
 
     //==생성 메서드==//
-    public static Transaction createTransaction(Account senderAccount, Account receiverAccount, Long amount, LocalDateTime transferTime, String memo) {
-        // MEMO: 빌더 패턴을 사용하는게 맞는 것인가? 생성 메서드를 사용하게 되면 빌더 패턴의 이점을 못누리는데...
-        // MEMO: TransactionFormDto를 파라미터로 받고 생성 메서드 사용
+    public static Transaction createTransaction(String senderName, String receiverName, Account senderAccount, Account receiverAccount, Long amount, LocalDateTime transferTime, String memo) {
+        //TODO: TransactionFormDto 만들어서 파라미터 변경해주기
+
         Transaction transaction = Transaction.builder()
+                .senderName(senderName)
+                .receiverName(receiverName)
                 .senderAccount(senderAccount)
                 .receiverAccount(receiverAccount)
                 .amount(amount)
@@ -54,7 +65,9 @@ public class Transaction extends BaseEntity {
                 .memo(memo)
                 .build();
 
+        // 보내는 사람의 계좌에서는 금액만큼 빼기
         senderAccount.deductBalance(amount);
+        // 받는 사람의 계좌에서는 금액만큼 더하기
         receiverAccount.addBalance(amount);
 
         return transaction;
@@ -62,5 +75,15 @@ public class Transaction extends BaseEntity {
 
     public void changeMemo(String memo) {
         this.memo = memo;
+    }
+
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "senderName='" + senderName + '\'' +
+                ", receiverName='" + receiverName + '\'' +
+                ", amount=" + amount +
+                ", memo='" + memo + '\'' +
+                '}';
     }
 }

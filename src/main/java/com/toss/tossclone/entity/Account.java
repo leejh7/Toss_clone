@@ -22,20 +22,20 @@ public class Account extends BaseEntity {
     @JoinColumn(name = "bank_key")
     private Bank bank;
 
-    @Column(name = "account_code", nullable = false)
+    @Column(name = "account_code", nullable = false, unique = true)
     private String accountCode;
 
     @Column
     private Long balance;
 
-    @Column(nullable = false)
+//    @Column(nullable = false)
     private String password;
 
     @Enumerated(EnumType.STRING)
     private AccountRole accountRole;
 
     @Builder
-    public Account(Member member, Bank bank, String accountCode, Long balance, String password) {
+    private Account(Member member, Bank bank, String accountCode, Long balance, String password) {
         this.member = member;
         this.bank = bank;
         this.accountCode = accountCode;

@@ -19,6 +19,6 @@ public abstract class BaseEntity extends BaseTimeEntity{
     @LastModifiedBy
     private String modifiedBy;
 
-    @Column(name = "delete_flag",nullable = false)
-    private Boolean delFlag;
+    @Column(name = "delete_flag", nullable = false)
+    private Boolean delFlag = false;
 }

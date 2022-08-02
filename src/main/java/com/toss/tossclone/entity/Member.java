@@ -24,7 +24,7 @@ public class Member extends BaseEntity {
     private String phoneNum;
 
     @Temporal(TemporalType.DATE)
-    @Column(nullable = false)
+//    @Column(nullable = false)
     private Date birthday;
 
     @Embedded
@@ -37,7 +37,7 @@ public class Member extends BaseEntity {
     private MemberRole role;
 
     @Builder
-    public Member(String name, String phoneNum, Date birthday, Address address, int transactionCount, MemberRole role) {
+    private Member(String name, String phoneNum, Date birthday, Address address, int transactionCount, MemberRole role) {
         this.name = name;
         this.phoneNum = phoneNum;
         this.birthday = birthday;
