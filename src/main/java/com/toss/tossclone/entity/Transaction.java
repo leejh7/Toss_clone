@@ -83,6 +83,7 @@ public class Transaction extends BaseEntity {
                 "senderName='" + senderName + '\'' +
                 ", receiverName='" + receiverName + '\'' +
                 ", amount=" + amount +
+                ", transferTime=" + transferTime +
                 ", memo='" + memo + '\'' +
                 '}';
     }
