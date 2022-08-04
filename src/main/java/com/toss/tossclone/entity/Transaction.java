@@ -1,6 +1,8 @@
 package com.toss.tossclone.entity;
 
+import com.toss.tossclone.constant.MyConstant;
 import com.toss.tossclone.exception.NotEnoughMoneyException;
+import com.toss.tossclone.exception.NotEnoughTransactionCountException;
 import lombok.*;
 import net.bytebuddy.asm.Advice;
 
@@ -52,7 +54,8 @@ public class Transaction extends BaseEntity {
     }
 
     //==생성 메서드==//
-    public static Transaction createTransaction(String senderName, String receiverName, Account senderAccount, Account receiverAccount, Long amount, LocalDateTime transferTime, String memo) {
+    public static Transaction createTransaction(String senderName, String receiverName, Account senderAccount, Account receiverAccount,
+                                                Long amount, LocalDateTime transferTime, String memo) {
         //TODO: TransactionFormDto 만들어서 파라미터 변경해주기
 
         Transaction transaction = Transaction.builder()
@@ -69,6 +72,12 @@ public class Transaction extends BaseEntity {
         senderAccount.deductBalance(amount);
         // 받는 사람의 계좌에서는 금액만큼 더하기
         receiverAccount.addBalance(amount);
+
+        try {
+            senderAccount.getMember().minusTransactionCount();
+        } catch (NotEnoughTransactionCountException e) {
+            senderAccount.deductBalance(MyConstant.COMMISSION);
+        }
 
         return transaction;
     }

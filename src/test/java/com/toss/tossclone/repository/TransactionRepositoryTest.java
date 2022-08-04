@@ -1,14 +1,18 @@
 package com.toss.tossclone.repository;
 
+import com.toss.tossclone.constant.MyConstant;
+import com.toss.tossclone.dto.MemberFormDto;
 import com.toss.tossclone.entity.Account;
 import com.toss.tossclone.entity.Member;
 import com.toss.tossclone.entity.Transaction;
 import com.toss.tossclone.exception.NotEnoughMoneyException;
+import com.toss.tossclone.exception.NotEnoughTransactionCountException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +37,9 @@ class TransactionRepositoryTest {
 
     @Autowired
     TransactionRepository transactionRepository;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     /**
      * <h3>테스트 내용</h3>
@@ -179,6 +186,25 @@ class TransactionRepositoryTest {
             System.out.println("amount = " + amount);
         }
     }
+    
+    @Test
+    @DisplayName("무료 송금 횟수")
+    public void useAllTransactionCount() throws Exception
+    {
+        // given
+        this.createTransactionList();
+        // when
+        Member member1 = memberRepository.findByEmail("member1"+"@test.com");
+        System.out.println("member1.getTransactionCount() = " + member1.getTransactionCount());
+
+        Account member1Account = accountRepository.findAccountByAccountCode("1111-1111");
+        Long oriBalance = member1Account.getBalance();
+        Long amount = 10000L;
+        Transaction exceptionTransaction = Transaction.createTransaction("member1", "member2", member1Account, accountRepository.findAccountByAccountCode("2222-2222"), amount, LocalDateTime.now(), "무료 수수료 끝남");
+        Long newBalance = member1Account.getBalance();
+        // then
+        assertThat(newBalance).isEqualTo(oriBalance - amount - MyConstant.COMMISSION);
+    }
 
     private void printTransactionList(List<Transaction> transactionList, String message) {
         System.out.println(message);
@@ -189,20 +215,24 @@ class TransactionRepositoryTest {
 
     private void createMemberList() {
         for(int i=1; i<=10; i++) {
-            Member member = Member.builder().name("member" + i).build();
+            MemberFormDto memberFormDto = new MemberFormDto();
+            memberFormDto.setName("member" + i);
+            memberFormDto.setEmail("member" + i + "@test.com");
+            memberFormDto.setPassword("password");
+            Member member = Member.createMember(memberFormDto, passwordEncoder);
             memberRepository.save(member);
         }
     }
 
     private void createAccountList() {
         for(int i=1; i<=10; i++) {
-            Member member = memberRepository.findMemberByName("member"+i);
+            Member member = memberRepository.findByEmail("member"+i+"@test.com");
             Account account = Account.builder().member(member).accountCode((1111 * i) + "-" + (1111 * i)).balance(100000L).build();
             accountRepository.save(account);
         }
     }
 
-    private void createTransactionList() {
+    private void createTransactionList() throws Exception {
         this.createMemberList();
         this.createAccountList();
 
