@@ -1,10 +1,8 @@
 package com.toss.tossclone.entity;
 
-import com.toss.tossclone.constant.MyConstant;
-import com.toss.tossclone.exception.NotEnoughMoneyException;
+import com.toss.tossclone.constant.TossConstant;
 import com.toss.tossclone.exception.NotEnoughTransactionCountException;
 import lombok.*;
-import net.bytebuddy.asm.Advice;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -36,6 +34,9 @@ public class Transaction extends BaseEntity {
     @Column(nullable = false)
     private Long amount;
 
+    @Column(name = "sender_account_history_balance", nullable = false)
+    private Long senderAccHisBal;
+
     @Column(name = "transfer_time", nullable = false)
     private LocalDateTime transferTime;
 
@@ -43,12 +44,13 @@ public class Transaction extends BaseEntity {
     private String memo;
 
     @Builder
-    private Transaction(String senderName, String receiverName, Account senderAccount, Account receiverAccount, Long amount, LocalDateTime transferTime, String memo) {
+    private Transaction(String senderName, String receiverName, Account senderAccount, Account receiverAccount, Long amount, Long senderAccHisBal, LocalDateTime transferTime, String memo) {
         this.senderName = senderName;
         this.receiverName = receiverName;
         this.senderAccount = senderAccount;
         this.receiverAccount = receiverAccount;
         this.amount = amount;
+        this.senderAccHisBal = senderAccHisBal;
         this.transferTime = transferTime;
         this.memo = memo;
     }
@@ -58,25 +60,26 @@ public class Transaction extends BaseEntity {
                                                 Long amount, LocalDateTime transferTime, String memo) {
         //TODO: TransactionFormDto 만들어서 파라미터 변경해주기
 
+        // 보내는 사람의 계좌에서는 금액만큼 빼기
+        Long restBalance = senderAccount.deductBalance(amount);
+        // 받는 사람의 계좌에서는 금액만큼 더하기
+        receiverAccount.addBalance(amount);
+
         Transaction transaction = Transaction.builder()
                 .senderName(senderName)
                 .receiverName(receiverName)
                 .senderAccount(senderAccount)
                 .receiverAccount(receiverAccount)
                 .amount(amount)
+                .senderAccHisBal(restBalance)
                 .transferTime(transferTime)
                 .memo(memo)
                 .build();
 
-        // 보내는 사람의 계좌에서는 금액만큼 빼기
-        senderAccount.deductBalance(amount);
-        // 받는 사람의 계좌에서는 금액만큼 더하기
-        receiverAccount.addBalance(amount);
-
         try {
             senderAccount.getMember().minusTransactionCount();
         } catch (NotEnoughTransactionCountException e) {
-            senderAccount.deductBalance(MyConstant.COMMISSION);
+            senderAccount.deductBalance(TossConstant.COMMISSION);
         }
 
         return transaction;

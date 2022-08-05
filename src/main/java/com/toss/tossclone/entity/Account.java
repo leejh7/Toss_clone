@@ -1,8 +1,10 @@
 package com.toss.tossclone.entity;
 
+import com.toss.tossclone.dto.AccountFormDto;
 import com.toss.tossclone.entity.constant.AccountRole;
 import com.toss.tossclone.exception.NotEnoughMoneyException;
 import lombok.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
 
@@ -13,6 +15,9 @@ public class Account extends BaseEntity {
     @Id @GeneratedValue
     @Column(name = "account_key")
     private Long id;
+
+    @Column(nullable = false)
+    private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_key")
@@ -28,14 +33,15 @@ public class Account extends BaseEntity {
     @Column
     private Long balance;
 
-//    @Column(nullable = false)
+    @Column(nullable = false)
     private String password;
 
     @Enumerated(EnumType.STRING)
     private AccountRole accountRole;
 
     @Builder
-    private Account(Member member, Bank bank, String accountCode, Long balance, String password) {
+    private Account(String name, Member member, Bank bank, String accountCode, Long balance, String password) {
+        this.name = name;
         this.member = member;
         this.bank = bank;
         this.accountCode = accountCode;
@@ -43,15 +49,30 @@ public class Account extends BaseEntity {
         this.password = password;
     }
 
+    public static Account createAccount(AccountFormDto accountFormDto, Member member, Bank bank, PasswordEncoder passwordEncoder) {
+        String password = passwordEncoder.encode(accountFormDto.getPassword());
+        Account account = Account.builder()
+                .name(accountFormDto.getName())
+                .accountCode(accountFormDto.getAccountCode())
+                .member(member)
+                .bank(bank)
+                .balance(accountFormDto.getBalance())
+                .password(password)
+                .build();
+
+        return account;
+    }
+
     //==비지니스 로직==//
     public void addBalance(Long money) {this.balance += money;}
 
-    public void deductBalance(Long money) {
+    public Long deductBalance(Long money) {
         Long restBalance = this.balance - money;
         if(restBalance < 0) {
             throw new NotEnoughMoneyException("잔액이 부족합니다");
         }
-        this.balance = restBalance;
+
+        return this.balance = restBalance;
     }
 
 }

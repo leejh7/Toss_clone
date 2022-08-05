@@ -1,19 +1,17 @@
 package com.toss.tossclone.repository;
 
-import com.toss.tossclone.constant.MyConstant;
+import com.toss.tossclone.constant.TossConstant;
 import com.toss.tossclone.dto.MemberFormDto;
 import com.toss.tossclone.entity.Account;
 import com.toss.tossclone.entity.Member;
 import com.toss.tossclone.entity.Transaction;
 import com.toss.tossclone.exception.NotEnoughMoneyException;
-import com.toss.tossclone.exception.NotEnoughTransactionCountException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
@@ -41,6 +39,9 @@ class TransactionRepositoryTest {
     @Autowired
     PasswordEncoder passwordEncoder;
 
+    @PersistenceContext
+    EntityManager em;
+
     /**
      * <h3>테스트 내용</h3>
      * 1. 거래가 만들어질 때 sender name, receiver name이 제대로 저장되는지 확인<br>
@@ -56,8 +57,8 @@ class TransactionRepositoryTest {
         memberRepository.save(sender);
         memberRepository.save(receiver);
 
-        Account senderAccount = Account.builder().member(sender).accountCode("1111-1111").balance(10000L).build();
-        Account receiverAccount = Account.builder().member(receiver).accountCode("2222-2222").balance(10000L).build();
+        Account senderAccount = Account.builder().member(sender).accountCode("1111-1111").balance(10000L).password("pw").build();
+        Account receiverAccount = Account.builder().member(receiver).accountCode("2222-2222").balance(10000L).password("pw").build();
         accountRepository.save(senderAccount);
         accountRepository.save(receiverAccount);
 
@@ -83,22 +84,7 @@ class TransactionRepositoryTest {
      * 1. 특정 계좌의 출금 거래 내역들을 확인<br>
      */
     @Test
-    @DisplayName("송금 거래 내역 조회1")
-    public void findTransactionBySenderAccount() throws Exception
-    {
-        // given
-        this.createTransactionList();
-
-        // when
-        Account senderAccount = accountRepository.findAccountByAccountCode("1111-1111");
-
-        // then
-        List<Transaction> transactionList = transactionRepository.findTransactionBySenderAccountOrderByTransferTimeDesc(senderAccount);
-        printTransactionList(transactionList, "[송금 내역]");
-    }
-
-    @Test
-    @DisplayName("송금 거래 내역 조회2")
+    @DisplayName("송금 거래 내역 조회")
     public void findTransactionBySenderAccountCode() throws Exception
     {
         // given
@@ -118,21 +104,6 @@ class TransactionRepositoryTest {
      */
     @Test
     @DisplayName("입금 거래 내역 조회")
-    public void findTransactionByReceiverAccount() throws Exception
-    {
-        // given
-        this.createTransactionList();
-
-        // when
-        Account receiverAccount = accountRepository.findAccountByAccountCode("1111-1111");
-
-        // then
-        List<Transaction> transactionList = transactionRepository.findTransactionByReceiverAccountOrderByTransferTimeDesc(receiverAccount);
-        printTransactionList(transactionList, "[입금 내역]");
-    }
-
-    @Test
-    @DisplayName("입금 거래 내역 조회2")
     public void findTransactionByReceiverAccountCode() throws Exception
     {
         // given
@@ -156,14 +127,15 @@ class TransactionRepositoryTest {
         // when
         Account targetAccount = accountRepository.findAccountByAccountCode("1111-1111");
 
-        // then
-        List<Transaction> transactionList1 = transactionRepository.findTransactionBySenderAccountOrReceiverAccountOrderByTransferTimeDesc(targetAccount, targetAccount);
-//        printTransactionList(transactionList1, "[전체 내역]");
+        List<Transaction> transactionList = transactionRepository.findTransactionByAccountCodeOrderByTransferTimeDesc(targetAccount.getAccountCode());
+        printTransactionList(transactionList, "[전체 내역]");
 
-        List<Transaction> transactionList2 = transactionRepository.findTransactionByAccountCodeOrderByTransferTimeDesc(targetAccount.getAccountCode());
-        printTransactionList(transactionList2, "[전체 내역]");
+        printDividerLine();
 
-        assertThat(transactionList1).isEqualTo(transactionList2);
+        for (Transaction transaction : transactionList) {
+            System.out.println("보내는 사람: " + transaction.getSenderName() + " 계좌번호: " + transaction.getSenderAccount().getAccountCode() + " 거래 당시 남은 잔액: " + transaction.getSenderAccHisBal());
+            System.out.println("받는 사람: " + transaction.getReceiverName() + " 계좌번호: " + transaction.getReceiverAccount().getAccountCode());
+        }
     }
 
     /**
@@ -203,7 +175,7 @@ class TransactionRepositoryTest {
         Transaction exceptionTransaction = Transaction.createTransaction("member1", "member2", member1Account, accountRepository.findAccountByAccountCode("2222-2222"), amount, LocalDateTime.now(), "무료 수수료 끝남");
         Long newBalance = member1Account.getBalance();
         // then
-        assertThat(newBalance).isEqualTo(oriBalance - amount - MyConstant.COMMISSION);
+        assertThat(newBalance).isEqualTo(oriBalance - amount - TossConstant.COMMISSION);
     }
 
     private void printTransactionList(List<Transaction> transactionList, String message) {
@@ -227,7 +199,7 @@ class TransactionRepositoryTest {
     private void createAccountList() {
         for(int i=1; i<=10; i++) {
             Member member = memberRepository.findByEmail("member"+i+"@test.com");
-            Account account = Account.builder().member(member).accountCode((1111 * i) + "-" + (1111 * i)).balance(100000L).build();
+            Account account = Account.builder().member(member).accountCode((1111 * i) + "-" + (1111 * i)).balance(100000L).password("pw").build();
             accountRepository.save(account);
         }
     }
@@ -242,7 +214,7 @@ class TransactionRepositoryTest {
             Account account = accountRepository.findAccountByAccountCode(accountCode);
             Transaction sendTransaction = Transaction.createTransaction(
                     "member1", "member" + i, member1Account,
-                    account, 1000L,
+                    account, (long) ((Math.random() * 1000) + 1),
                     LocalDateTime.of(2022, Month.JULY, (int)(Math.random() * 3) + 1, 12, 0, 0), "[테스트용] 돈 보내기 메모" + i);
             Transaction receiveTransaction = Transaction.createTransaction(
                     "member" + i, "member1", account,
@@ -255,6 +227,14 @@ class TransactionRepositoryTest {
         Transaction transaction = Transaction.createTransaction("member2", "member3", accountRepository.findAccountByAccountCode("2222-2222"), accountRepository.findAccountByAccountCode("3333-3333"), 1000L, LocalDateTime.now(), "[테스트용] 출력 되면 안되는데...");
         transactionRepository.save(transaction);
 
+        em.flush();
+        em.clear();
+
+        printDividerLine();
+    }
+
+    private void printDividerLine() {
+        System.out.println("===============================================================");
     }
 
 }
