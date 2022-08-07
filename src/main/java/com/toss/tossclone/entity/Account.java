@@ -12,6 +12,8 @@ import javax.persistence.*;
 @Getter @Setter(AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Account extends BaseEntity {
+    // TODO: Account를 상속 받는 입출금 계좌, 적금 계좌 등등 만들어보기
+
     @Id @GeneratedValue
     @Column(name = "account_key")
     private Long id;
@@ -49,11 +51,11 @@ public class Account extends BaseEntity {
         this.password = password;
     }
 
-    public static Account createAccount(AccountFormDto accountFormDto, Member member, Bank bank, PasswordEncoder passwordEncoder) {
+    public static Account createAccount(AccountFormDto accountFormDto, String accountCode, Member member, Bank bank, PasswordEncoder passwordEncoder) {
         String password = passwordEncoder.encode(accountFormDto.getPassword());
         Account account = Account.builder()
                 .name(accountFormDto.getName())
-                .accountCode(accountFormDto.getAccountCode())
+                .accountCode(accountCode)
                 .member(member)
                 .bank(bank)
                 .balance(accountFormDto.getBalance())

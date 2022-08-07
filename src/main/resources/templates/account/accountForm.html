@@ -21,7 +21,17 @@
             if(errorMessage != null){
                 alert(errorMessage);
             }
+
+            makeAccountName();
         });
+
+        function makeAccountName() {
+            $(".custom-select").on("change", function () {
+                let bankName = $(".custom-select option:selected").text();
+                let accountName = bankName + " 입출금 계좌";
+                $(".custom-input").val(accountName);
+            });
+        }
 
         // TODO: 셀렉트 박스에서 은행 선택하면 UUID로 계좌번호 생성
         // TODO: 은행별 default 계좌명 생성
@@ -33,21 +43,19 @@
 
     <form action="/account/new" th:action role="form" method="post"  th:object="${accountFormDto}">
         <div class="form-group">
-            <select class="custom-select">
+            <select th:field="*{bankId}" class="custom-select">
+                <option value="">은행 선택</option>
                 <option th:each="bank : ${banks}"
                         th:value="${bank.id}"
                         th:text="${bank.name}">
                 </option>
             </select>
+            <p th:if="${#fields.hasErrors('bankId')}" th:errors="*{bankId}" class="fieldError">Incorrect data</p>
         </div>
 
         <div class="form-group">
-            <label th:for="accountCode">계좌번호</label>
-            <input type="text" th:field="*{accountCode}" class="form-control" readonly>
-        </div>
-        <div class="form-group">
             <label th:for="name">계좌명</label>
-            <input type="text" th:field="*{name}" class="form-control" th:value="*{name}">
+            <input type="text" th:field="*{name}" class="form-control custom-input">
             <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="fieldError">Incorrect data</p>
         </div>
         <div class="form-group">

@@ -5,13 +5,13 @@ import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Getter @Setter
 public class AccountFormDto {
 
+    @NotNull(message = "은행 선택은 필수입니다.")
     private Long bankId;
-
-    private String accountCode;
 
     @NotBlank(message = "계좌명 입력은 필수입니다.")
     private String name;

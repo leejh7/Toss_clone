@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.math.BigInteger;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -29,7 +32,29 @@ public class AccountService {
         Member member = memberRepository.findByEmail(memberEmail);
         Bank bank = bankRepository.findById(accountFormDto.getBankId()).orElseThrow(EntityNotFoundException::new);
 
-        Account account = Account.createAccount(accountFormDto, member, bank, passwordEncoder);
+        String accountCode = bank.getPrefixAccountCode() + generateUniqueId();
+        validateDuplicateAccountCode(accountCode);
+
+        Account account = Account.createAccount(accountFormDto, accountCode, member, bank, passwordEncoder);
         accountRepository.save(account);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Account> findMyAccounts(String memberEmail) {
+        return accountRepository.findByMemberEmail(memberEmail);
+    }
+
+    private void validateDuplicateAccountCode(String accountCode) {
+        Account findAccounts = accountRepository.findAccountByAccountCode(accountCode);
+        if(findAccounts != null) {
+            throw new IllegalStateException("이미 존재하는 계좌번호입니다.");
+        }
+    }
+
+    private String generateUniqueId() {
+        String uid = UUID.randomUUID().toString();
+        uid = uid.replaceAll("-","");
+        BigInteger bigInt = new BigInteger(uid, 16);
+        return bigInt.toString().substring(0, 10);
     }
 }
