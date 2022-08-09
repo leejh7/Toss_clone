@@ -11,6 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,8 +58,8 @@ class TransactionRepositoryTest {
         memberRepository.save(sender);
         memberRepository.save(receiver);
 
-        Account senderAccount = Account.builder().member(sender).accountCode("1111-1111").balance(10000L).password("pw").build();
-        Account receiverAccount = Account.builder().member(receiver).accountCode("2222-2222").balance(10000L).password("pw").build();
+        Account senderAccount = Account.builder().name("돈 보내는 사람 계좌").member(sender).accountCode("1111-1111").balance(10000L).password("pw").build();
+        Account receiverAccount = Account.builder().name("돈 받는 사람 계좌").member(receiver).accountCode("2222-2222").balance(10000L).password("pw").build();
         accountRepository.save(senderAccount);
         accountRepository.save(receiverAccount);
 
@@ -133,8 +134,27 @@ class TransactionRepositoryTest {
         printDividerLine();
 
         for (Transaction transaction : transactionList) {
-            System.out.println("보내는 사람: " + transaction.getSenderName() + " 계좌번호: " + transaction.getSenderAccount().getAccountCode() + " 거래 당시 남은 잔액: " + transaction.getSenderAccHisBal());
-            System.out.println("받는 사람: " + transaction.getReceiverName() + " 계좌번호: " + transaction.getReceiverAccount().getAccountCode());
+            System.out.println("보내는 사람: " + transaction.getSenderName() + " 거래 당시 남은 잔액: " + transaction.getSenderAccHisBal());
+            System.out.println("받는 사람: " + transaction.getReceiverName());
+        }
+    }
+
+    @Test
+    @DisplayName("최근 보낸 계좌 조회")
+    public void findRecentRecAcc() throws Exception
+    {
+        // given
+        this.createTransactionList();
+
+        Account senderAccount = accountRepository.findAccountByAccountCode("1111-1111");
+
+        // when
+        List<Account> recAccWithPaging = transactionRepository.findReceiverAccountByAccountCodeOrderByTransferTimeDesc(senderAccount.getAccountCode(), PageRequest.of(0, 3));
+
+        printDividerLine();
+
+        for (Account account : recAccWithPaging) {
+            System.out.println("받는 사람: " + account.getName() + " 계좌번호: " + account.getAccountCode());
         }
     }
 
@@ -181,7 +201,8 @@ class TransactionRepositoryTest {
     private void printTransactionList(List<Transaction> transactionList, String message) {
         System.out.println(message);
         for (Transaction transaction : transactionList) {
-            System.out.println(transaction);
+            System.out.println("받은 사람:" + transaction.getReceiverName() + " 금액: " + transaction.getAmount());
+            System.out.println("보낸 사람 잔액: " + transaction.getSenderAccHisBal());
         }
     }
 
@@ -199,7 +220,7 @@ class TransactionRepositoryTest {
     private void createAccountList() {
         for(int i=1; i<=10; i++) {
             Member member = memberRepository.findByEmail("member"+i+"@test.com");
-            Account account = Account.builder().member(member).accountCode((1111 * i) + "-" + (1111 * i)).balance(100000L).password("pw").build();
+            Account account = Account.builder().name("member"+i+"\'s Acc").member(member).accountCode((1111 * i) + "-" + (1111 * i)).balance(100000L).password("pw").build();
             accountRepository.save(account);
         }
     }

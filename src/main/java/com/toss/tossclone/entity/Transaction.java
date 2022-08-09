@@ -58,7 +58,7 @@ public class Transaction extends BaseEntity {
     //==생성 메서드==//
     public static Transaction createTransaction(String senderName, String receiverName, Account senderAccount, Account receiverAccount,
                                                 Long amount, LocalDateTime transferTime, String memo) {
-        //TODO: TransactionFormDto 만들어서 파라미터 변경해주기
+        // TODO: TransactionFormDto 만들어서 파라미터 변경해주기
 
         // 보내는 사람의 계좌에서는 금액만큼 빼기
         Long restBalance = senderAccount.deductBalance(amount);
