@@ -37,3 +37,6 @@ out/
 .vscode/
 
 .DS_Store
+
+### Jasypt ###
+secretkey.txt
