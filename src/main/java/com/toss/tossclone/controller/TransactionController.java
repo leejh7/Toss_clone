@@ -1,7 +1,13 @@
 package com.toss.tossclone.controller;
 
 import com.toss.tossclone.dto.ReceiverAccountDto;
+import com.toss.tossclone.dto.ReceiverAccountFormDto;
 import com.toss.tossclone.dto.SenderAccountDto;
+import com.toss.tossclone.dto.TransactionFormDto;
+import com.toss.tossclone.entity.Bank;
+import com.toss.tossclone.repository.AccountRepository;
+import com.toss.tossclone.repository.BankRepository;
+import com.toss.tossclone.service.AccountService;
 import com.toss.tossclone.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
@@ -21,54 +28,105 @@ import java.util.List;
 public class TransactionController {
 
     private final TransactionService transactionService;
+    private final AccountService accountService;
 
-    @GetMapping("/new/first")
-    public String transactionFormFirst(@ModelAttribute("senderAccountDto") SenderAccountDto senderAccountDto, Principal principal, Model model) {
-        List<ReceiverAccountDto> receiverAccountDtos = transactionService.findMyAccounts(principal.getName(), senderAccountDto.getAccountCode());
-        model.addAttribute("receiverAccountDtos", receiverAccountDtos);
+    private final BankRepository bankRepository;
+    private final AccountRepository accountRepository;
+
+    @PostMapping("/new/first")
+    public String transactionFormFirst (@Valid @ModelAttribute("senderAccountDto") SenderAccountDto senderAccountDto,
+                                        BindingResult bindingResult, Principal principal, Model model)
+    {
+        // TODO: SenderAccountDto도 검증해주기 / sender의 경우 문제가 있으면 어떻게 처리해아할까?
+        if(bindingResult.hasErrors()) {
+            return "redirect:/account/list";
+        }
+
+        List<ReceiverAccountDto> myReceiverAccountDtos = accountService.findMyAccountsExceptMe(principal.getName(), senderAccountDto.getAccountCode());
+        model.addAttribute("myReceiverAccountDtos", myReceiverAccountDtos);
 
         return "transaction/transactionFormFirst";
     }
 
-    @PostMapping("/new/first")
-    public String transactionFormFirst (
-            @Valid @ModelAttribute("senderAccountDto") SenderAccountDto senderAccountDto, BindingResult bindingResult1,
-            @Valid @ModelAttribute("receiverAccountDto") ReceiverAccountDto receiverAccountDto, BindingResult bindingResult2)
-    {
-        // TODO: SenderAccountDto도 검증해주기 / sender의 경우 문제가 있으면 어떻게 처리해아할까?
+    @PostMapping("/new/second")
+    public String transactionFormSecond(
+            @Valid @ModelAttribute("senderAccountDto") SenderAccountDto senderAccountDto, BindingResult bindingResult, Model model) {
 
-        if(bindingResult2.hasErrors()) {
-            return "redirect:/transaction/new/second";
+        if(bindingResult.hasErrors()) {
+            return "redirect:/account/list";
         }
 
-        return "redirect:/transaction/new/last";
-    }
-
-    @GetMapping("/new/second")
-    public String transactionSecondGet() {
+        List<Bank> banks = bankRepository.findAll();
+        model.addAttribute("banks", banks);
 
         return "transaction/transactionFormSecond";
     }
 
-    @PostMapping("/new/second")
-    @ResponseBody
-    public String transactionFormSecondPost() {
-        return "[second / POST] OK";
-    }
+    @PostMapping("/new/secondToLast")
+    public String dataPreprocessing(
+            @Valid @ModelAttribute("senderAccountDto") SenderAccountDto senderAccountDto, BindingResult senderBindingResult,
+            @Valid @ModelAttribute("receiverAccountFormDto")ReceiverAccountFormDto receiverAccountFormDto, BindingResult receiverBindingResult,
+            Model model
+    ) {
+        if(senderBindingResult.hasErrors()) {
+            return "redirect:/account/list";
+        }
+        if(receiverBindingResult.hasErrors()) {
+            return "redirect:/account/list";
+        }
 
-    @GetMapping("/new/last")
-    @ResponseBody
-    public String transactionFormLastGet(@ModelAttribute("senderAccountDto") SenderAccountDto senderAccountDto,
-                                      @ModelAttribute("receiverAccountDto") ReceiverAccountDto receiverAccountDto) {
+        String senderName = accountRepository.findMemberNameByAccountCode(senderAccountDto.getAccountCode()).orElseThrow(EntityNotFoundException::new);
+        String receiverName = accountRepository.findMemberNameByAccountCode(receiverAccountFormDto.getReceiverAccountCode()).orElseThrow(EntityNotFoundException::new);
+
+        String accountName = accountRepository.findAccountNameByAccountCode(receiverAccountFormDto.getReceiverAccountCode()).orElseThrow(EntityNotFoundException::new);
+
+        ReceiverAccountDto receiverAccountDto = ReceiverAccountDto.of(receiverAccountFormDto, accountName);
+        log.info("receiverAccountCode= {}", receiverAccountDto.getReceiverAccountCode());
+        log.info("receiverAccountCode= {}", receiverAccountFormDto.getReceiverAccountCode());
+
+        model.addAttribute("senderName", senderName);
+        model.addAttribute("receiverName", receiverName);
+        model.addAttribute("receiverAccountDto", receiverAccountDto);
 
         return "transaction/transactionFormLast";
     }
 
     @PostMapping("/new/last")
-    @ResponseBody
-    public String transactionFormLastPost(@ModelAttribute("senderAccountDto") SenderAccountDto senderAccountDto,
-                                      @Valid @ModelAttribute("receiverAccountDto") ReceiverAccountDto receiverAccountDto) {
+    public String transactionFormLast(
+            @Valid @ModelAttribute("senderAccountDto") SenderAccountDto senderAccountDto, BindingResult senderBindingResult,
+            @Valid @ModelAttribute("receiverAccountDto") ReceiverAccountDto receiverAccountDto, BindingResult receiverBindingResult,
+            Model model
+    ) {
+        if(senderBindingResult.hasErrors()) {
+            return "redirect:/account/list";
+        }
+        if(receiverBindingResult.hasErrors()) {
+            return "redirect:/account/list";
+        }
 
-        return "[last / POST] OK";
+        log.info("senderAccountDto: {}", senderAccountDto);
+        log.info("receiverAccountDto: {}", receiverAccountDto);
+
+        String senderName = accountRepository.findMemberNameByAccountCode(senderAccountDto.getAccountCode()).orElseThrow(EntityNotFoundException::new);
+        String receiverName = accountRepository.findMemberNameByAccountCode(receiverAccountDto.getReceiverAccountCode()).orElseThrow(EntityNotFoundException::new);
+        model.addAttribute("senderName", senderName);
+        model.addAttribute("receiverName", receiverName);
+
+        return "transaction/transactionFormLast";
+    }
+
+    @PostMapping("/new/complete")
+    @ResponseBody
+    public String transactionFormComplete(
+            @Valid @ModelAttribute("transactionFormDto") TransactionFormDto transactionFormDto, BindingResult bindingResult
+    )
+    {
+        if(bindingResult.hasErrors()) {
+            return "에러!!!";
+        }
+
+        transactionService.saveTransaction(transactionFormDto);
+
+        return "거래 완료!";
     }
 }

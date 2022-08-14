@@ -1,10 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
 
-</body>
+<div layout:fragment="content">
+    <h1 th:text="|내 ${senderAccountDto.accountName}에서|"></h1>
+    <span class="fs-6 border rounded text-muted p-1" th:text="|출금 가능 금액 ${senderAccountDto.balance}|"></span>
+
+    <h1 class="mt-3" th:if="${receiverAccountDto.mine}" th:text="|내 ${receiverAccountDto.receiverAccountName}로|"></h1>
+    <h1 class="mt-3" th:unless="${receiverAccountDto.mine}" th:text="|${receiverAccountDto.receiverAccountName}로|"></h1>
+    <span class="fs-6 border rounded text-muted p-1 mb-3" th:text="|${receiverAccountDto.bankName} ${receiverAccountDto.receiverAccountCode}|"></span>
+
+    <form class="mt-5" action="/transaction/new/complete" method="post">
+        <input type="hidden" name="senderName" th:value="${senderName}">
+        <input type="hidden" name="receiverName" th:value="${receiverName}">
+        <input type="hidden" name="senderAccountCode" th:value="${senderAccountDto.accountCode}">
+        <input type="hidden" name="receiverAccountCode" th:value="${receiverAccountDto.receiverAccountCode}">
+
+        <div class="form-group">
+            <input class="fs-2 border-top-0 border-left-0 border-right-0" type="number" name="amount" placeholder="얼마나 옮길까요?">
+        </div>
+        <span class="fs-6 text-muted border rounded p-1" th:text="|잔액&bull;${senderAccountDto.balance}원 입력|"></span>
+        <div class="mt-3">
+            <button class="btn btn-primary" type="submit">다음</button>
+        </div>
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+    </form>
+</div>
+
 </html>

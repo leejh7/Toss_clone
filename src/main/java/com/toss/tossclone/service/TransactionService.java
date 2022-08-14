@@ -1,12 +1,18 @@
 package com.toss.tossclone.service;
 
 import com.toss.tossclone.dto.ReceiverAccountDto;
+import com.toss.tossclone.dto.TransactionFormDto;
 import com.toss.tossclone.entity.Account;
+import com.toss.tossclone.entity.Transaction;
+import com.toss.tossclone.exception.NotEnoughMoneyException;
 import com.toss.tossclone.repository.AccountRepository;
+import com.toss.tossclone.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,20 +21,21 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TransactionService {
 
+    private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
 
-    public List<ReceiverAccountDto> findMyAccounts(String email, String accountCode) {
-        List<Account> myAccounts = accountRepository.findByMemberEmailExceptMe(email, accountCode);
+    public void saveTransaction(TransactionFormDto transactionFormDto) throws NotEnoughMoneyException {
+        Account senderAccount = accountRepository.findAccountByAccountCode(transactionFormDto.getSenderAccountCode());
+        Account receiverAccount = accountRepository.findAccountByAccountCode(transactionFormDto.getReceiverAccountCode());
 
-        List<ReceiverAccountDto> result = new ArrayList<>();
-        for (Account myAccount : myAccounts) {
-            ReceiverAccountDto receiverAccountDto = new ReceiverAccountDto();
-            receiverAccountDto.setReceiverAccountName(myAccount.getName());
-            receiverAccountDto.setReceiverAccountCode(myAccount.getAccountCode());
-            receiverAccountDto.setBankName(myAccount.getBank().getName());
-            result.add(receiverAccountDto);
-        }
+        Transaction transaction = Transaction.createTransaction(
+                transactionFormDto.getSenderName(), transactionFormDto.getReceiverName(),
+                senderAccount, receiverAccount,
+                transactionFormDto.getAmount(), LocalDateTime.now(), ""
+        );
 
-        return result;
+        transactionRepository.save(transaction);
     }
+
+
 }

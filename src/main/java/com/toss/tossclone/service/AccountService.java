@@ -1,6 +1,7 @@
 package com.toss.tossclone.service;
 
 import com.toss.tossclone.dto.AccountFormDto;
+import com.toss.tossclone.dto.ReceiverAccountDto;
 import com.toss.tossclone.entity.Account;
 import com.toss.tossclone.entity.Bank;
 import com.toss.tossclone.entity.Member;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,6 +44,22 @@ public class AccountService {
     @Transactional(readOnly = true)
     public List<Account> findMyAccounts(String memberEmail) {
         return accountRepository.findByMemberEmail(memberEmail);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReceiverAccountDto> findMyAccountsExceptMe(String email, String accountCode) {
+        List<Account> myAccountsExceptMe = accountRepository.findByMemberEmailExceptMe(email, accountCode);
+
+        List<ReceiverAccountDto> result = new ArrayList<>();
+        for (Account myAccount : myAccountsExceptMe) {
+            ReceiverAccountDto receiverAccountDto = new ReceiverAccountDto();
+            receiverAccountDto.setReceiverAccountName(myAccount.getName());
+            receiverAccountDto.setReceiverAccountCode(myAccount.getAccountCode());
+            receiverAccountDto.setBankName(myAccount.getBank().getName());
+            result.add(receiverAccountDto);
+        }
+
+        return result;
     }
 
     private void validateDuplicateAccountCode(String accountCode) {

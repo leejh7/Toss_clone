@@ -46,7 +46,7 @@
             <td th:text="${account.bank.name}"></td>
             <td th:text="${account.name}"></td>
             <td th:text="${account.balance}"></td>
-            <form th:action="@{/transaction/new/first}" method="get">
+            <form th:action="@{/transaction/new/first}" method="post">
                 <td>
                     <input type="hidden" name="accountCode" th:value="${account.accountCode}">
                     <input type="hidden" name="accountName" th:value="${account.name}">
