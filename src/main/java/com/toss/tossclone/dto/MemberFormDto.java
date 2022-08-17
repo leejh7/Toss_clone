@@ -8,6 +8,10 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.validation.constraints.*;
 import java.time.LocalDate;
 
+/**
+ * 회원 등록 폼(form)에서 받아온 데이터를 담는 DTO
+ * Member(Entity)의 생성 메서드(createMember)의 매개변수로 사용
+ */
 @Getter @Setter
 public class MemberFormDto {
     @NotBlank(message = "이름 입력은 필수입니다.")

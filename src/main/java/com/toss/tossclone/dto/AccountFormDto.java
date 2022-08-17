@@ -7,6 +7,10 @@ import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+/**
+ * 계정 등록 폼(form)에서 받아온 데이터를 담는 DTO
+ * Account(Entity)의 생성 메서드(createAccount)의 매개변수로 사용
+ */
 @Getter @Setter
 public class AccountFormDto {
 

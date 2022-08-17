@@ -8,23 +8,6 @@
 <th:block layout:fragment="script">
 
     <script th:inline="javascript">
-        function makeTransaction(accountCode) {
-            alert(accountCode)
-            alert(typeof accountCode)
-
-            let form = document.createElement("form");
-            form.setAttribute("method", "post");
-            form.setAttribute("action", "/transaction/" + accountCode + "/new");
-
-            let input = document.createElement("input");
-            input.type = "hidden";
-            input.name = [[${_csrf.parameterName}]];
-            input.value = [[${_csrf.token}]];
-
-            form.appendChild(input);
-            document.body.appendChild(form);
-            form.submit();
-        }
     </script>
 
 </th:block>

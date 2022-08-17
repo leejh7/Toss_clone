@@ -52,10 +52,12 @@ public class AccountService {
 
         List<ReceiverAccountDto> result = new ArrayList<>();
         for (Account myAccount : myAccountsExceptMe) {
+            // TODO: Account -> ReceiverAccountDto 맵퍼 메서드 만들어주기
             ReceiverAccountDto receiverAccountDto = new ReceiverAccountDto();
             receiverAccountDto.setReceiverAccountName(myAccount.getName());
             receiverAccountDto.setReceiverAccountCode(myAccount.getAccountCode());
             receiverAccountDto.setBankName(myAccount.getBank().getName());
+            receiverAccountDto.setMine(true);
             result.add(receiverAccountDto);
         }
 

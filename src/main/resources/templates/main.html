@@ -4,6 +4,13 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/layout1}">
 
+<th:block layout:fragment="script">
+
+    <script th:inline="javascript">
+    </script>
+
+</th:block>
+
 <div layout:fragment="content">
     <h1 th:text="${username}">메인페이지입니다.</h1>
 </div>

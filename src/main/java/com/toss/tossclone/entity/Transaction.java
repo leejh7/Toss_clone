@@ -77,7 +77,7 @@ public class Transaction extends BaseEntity {
                 .build();
 
         try {
-            senderAccount.getMember().minusTransactionCount();
+            senderAccount.getMember().countingTransactionCount();
         } catch (NotEnoughTransactionCountException e) {
             senderAccount.deductBalance(TossConstant.COMMISSION);
         }

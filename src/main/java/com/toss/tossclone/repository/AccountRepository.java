@@ -12,6 +12,9 @@ import java.util.Optional;
 public interface AccountRepository extends JpaRepository<Account, Long> {
     Account findAccountByAccountCode(String accountCode);
 
+    @Query("select acc from Account acc join fetch acc.member where acc.accountCode =:accountCode")
+    Account findByAccountCodeFetchJoinMember(@Param("accountCode") String accountCode);
+
     @Query("select acc from Account acc join fetch acc.bank where acc.member.email =:email")
     List<Account> findByMemberEmail(@Param("email") String email);
 

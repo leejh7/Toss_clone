@@ -27,6 +27,11 @@ import java.util.List;
 @RequestMapping("/transaction")
 public class TransactionController {
 
+    /**
+     * TODO: Post/Redirect/Get 다시 생각해보기 현재 PRG를 지키지 못하고 있음 지킬 수 있는 좋은 방법이 없을까?
+     * TODO: validation 후 error message 처리해주기
+     */
+
     private final TransactionService transactionService;
     private final AccountService accountService;
 
@@ -44,6 +49,9 @@ public class TransactionController {
 
         List<ReceiverAccountDto> myReceiverAccountDtos = accountService.findMyAccountsExceptMe(principal.getName(), senderAccountDto.getAccountCode());
         model.addAttribute("myReceiverAccountDtos", myReceiverAccountDtos);
+
+        List<ReceiverAccountDto> recentReceiverAccountDtos = transactionService.findRecentTransactionAccounts(principal.getName(), senderAccountDto.getAccountCode());
+        model.addAttribute("recentReceiverAccountDtos", recentReceiverAccountDtos);
 
         return "transaction/transactionFormFirst";
     }
@@ -116,17 +124,15 @@ public class TransactionController {
     }
 
     @PostMapping("/new/complete")
-    @ResponseBody
     public String transactionFormComplete(
             @Valid @ModelAttribute("transactionFormDto") TransactionFormDto transactionFormDto, BindingResult bindingResult
-    )
-    {
-        if(bindingResult.hasErrors()) {
+    ) {
+        if (bindingResult.hasErrors()) {
             return "에러!!!";
         }
 
         transactionService.saveTransaction(transactionFormDto);
 
-        return "거래 완료!";
+        return "redirect:/account/list";
     }
 }
