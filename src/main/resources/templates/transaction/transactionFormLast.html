@@ -6,9 +6,7 @@
 <div layout:fragment="content">
     <h1 th:text="|내 ${senderAccountDto.accountName}에서|"></h1>
     <span class="fs-6 border rounded text-muted p-1" th:text="|출금 가능 금액 ${senderAccountDto.balance}|"></span>
-
-    <h1 class="mt-3" th:if="${receiverAccountDto.mine}" th:text="|내 ${receiverAccountDto.receiverAccountName}로|"></h1>
-    <h1 class="mt-3" th:unless="${receiverAccountDto.mine}" th:text="|${receiverAccountDto.receiverAccountName}로|"></h1>
+    <h1 class="mt-3" th:text="|${receiverAccountDto.receiverName}의 ${receiverAccountDto.receiverAccountName}로|"></h1>
     <span class="fs-6 border rounded text-muted p-1 mb-3" th:text="|${receiverAccountDto.bankName} ${receiverAccountDto.receiverAccountCode}|"></span>
 
     <form class="mt-5" action="/transaction/new/complete" method="post">

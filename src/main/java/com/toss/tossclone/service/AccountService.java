@@ -8,6 +8,7 @@ import com.toss.tossclone.entity.Member;
 import com.toss.tossclone.repository.AccountRepository;
 import com.toss.tossclone.repository.BankRepository;
 import com.toss.tossclone.repository.MemberRepository;
+import com.toss.tossclone.vo.AccountVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -56,12 +57,26 @@ public class AccountService {
             ReceiverAccountDto receiverAccountDto = new ReceiverAccountDto();
             receiverAccountDto.setReceiverAccountName(myAccount.getName());
             receiverAccountDto.setReceiverAccountCode(myAccount.getAccountCode());
+            receiverAccountDto.setReceiverName("나");
             receiverAccountDto.setBankName(myAccount.getBank().getName());
             receiverAccountDto.setMine(true);
             result.add(receiverAccountDto);
         }
 
         return result;
+    }
+
+    @Transactional(readOnly = true)
+    public AccountVo findMyAccount(String accountCode) {
+        Account account = accountRepository.findFetchJoinByAccountCode(accountCode);
+
+        AccountVo accountVo = new AccountVo();
+        accountVo.setAccountName(account.getName());
+        accountVo.setAccountCode(account.getAccountCode());
+        accountVo.setBankName(account.getBank().getName());
+        accountVo.setBalance(account.getBalance());
+
+        return accountVo;
     }
 
     private void validateDuplicateAccountCode(String accountCode) {

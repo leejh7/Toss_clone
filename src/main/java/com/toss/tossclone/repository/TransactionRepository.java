@@ -12,7 +12,6 @@ import java.util.List;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
-
     // 출금 내역 조회
     @Query(value = "select t from Transaction t inner join t.senderAccount sa " +
             "where sa.accountCode =:accountCode order by t.transferTime desc ")
@@ -24,11 +23,11 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     List<Transaction> findTransactionByReceiverAccountCodeOrderByTransferTimeDesc(@Param("accountCode") String accountCode);
 
     // 입금, 출금 내역 모두 조회
-    @Query(value = "select t from Transaction t inner join t.senderAccount sa " +
-            "inner join t.receiverAccount ra " +
-            "where sa.accountCode =:accountCode or ra.accountCode =: accountCode order by t.transferTime desc ")
+    @Query(value = "select t from Transaction t inner join fetch t.senderAccount " +
+            "inner join fetch t.receiverAccount " +
+            "where t.senderAccount.accountCode =:accountCode or t.receiverAccount.accountCode =: accountCode " +
+            "order by t.transferTime desc ")
     List<Transaction> findTransactionByAccountCodeOrderByTransferTimeDesc(@Param("accountCode") String accountCode);
-
 
     // 최근 보낸 계좌 조회
     // TODO: 페이징 적용하기 + 프론트단 ajax로 페이징 받아오기

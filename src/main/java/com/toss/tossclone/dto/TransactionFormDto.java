@@ -2,6 +2,7 @@ package com.toss.tossclone.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.format.annotation.NumberFormat;
 
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
@@ -26,6 +27,7 @@ public class TransactionFormDto {
     private String receiverAccountCode;
 
     @DecimalMin(value = "0", inclusive = false, message = "1원 이상은 보내야합니다.")
+    @NumberFormat(pattern = "###,###")
     private Long amount;
 
     // TODO: memo 받아오기

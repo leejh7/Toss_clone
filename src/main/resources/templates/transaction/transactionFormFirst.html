@@ -29,6 +29,7 @@
                     <input type="text" class="form-control-plaintext text-muted" name="receiverAccountCode" th:value="${receiverAccountDto.receiverAccountCode}" readonly>
                 </div>
                 <div class="col-2 d-flex justify-content-center align-items-center">
+                    <input type="hidden" name="receiverName" th:value="${receiverAccountDto.receiverName}">
                     <input type="hidden" name="mine" value="true">
                     <button type="submit" class="btn btn-primary">보내기</button>
                 </div>
@@ -51,6 +52,7 @@
                     <input type="text" class="form-control-plaintext" name="bankName" th:value="${receiverAccountDto.bankName}" readonly>
                 </div>
                 <div class="col-6">
+                    <input type="text" class="form-control-plaintext" name="receiverName" th:value="${receiverAccountDto.receiverName}" readonly>
                     <input type="text" class="form-control-plaintext" name="receiverAccountName" th:value="${receiverAccountDto.receiverAccountName}" readonly>
                     <input type="text" class="form-control-plaintext text-muted" name="receiverAccountCode" th:value="${receiverAccountDto.receiverAccountCode}" readonly>
                 </div>

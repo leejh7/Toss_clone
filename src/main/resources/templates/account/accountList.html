@@ -27,7 +27,10 @@
         <tbody>
         <tr th:each="account : ${accounts}">
             <td th:text="${account.bank.name}"></td>
-            <td th:text="${account.name}"></td>
+            <td>
+                <a th:href="@{/transaction/all/history(accountCode=${account.accountCode})}" th:text="${account.name}"></a>
+            </td>
+
             <td th:text="${account.balance}"></td>
             <form th:action="@{/transaction/new/first}" method="post">
                 <td>

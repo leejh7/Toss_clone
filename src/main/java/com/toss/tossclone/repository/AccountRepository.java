@@ -1,7 +1,6 @@
 package com.toss.tossclone.repository;
 
 import com.toss.tossclone.entity.Account;
-import com.toss.tossclone.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,6 +10,10 @@ import java.util.Optional;
 
 public interface AccountRepository extends JpaRepository<Account, Long> {
     Account findAccountByAccountCode(String accountCode);
+
+    // MEMO: bankName만 필요한데 굳이 Bank의 모든 필드를 긁어와야 할까?
+    @Query("select acc from Account acc join fetch acc.bank where acc.accountCode =:accountCode")
+    Account findFetchJoinByAccountCode(@Param("accountCode") String accountCode);
 
     @Query("select acc from Account acc join fetch acc.member where acc.accountCode =:accountCode")
     Account findByAccountCodeFetchJoinMember(@Param("accountCode") String accountCode);

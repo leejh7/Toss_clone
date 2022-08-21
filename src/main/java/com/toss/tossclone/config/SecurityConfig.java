@@ -37,6 +37,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.exceptionHandling()
                 .authenticationEntryPoint(new CustomAuthenticationEntryPoint());
+
+        http.headers(headers -> headers
+                        .cacheControl(cache -> cache.disable()));
     }
 
     @Bean

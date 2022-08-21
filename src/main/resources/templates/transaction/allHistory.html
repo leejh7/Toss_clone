@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+
+<div layout:fragment="content" th:object="${targetAccount}">
+    <h3 class="mt-5" th:text="*{accountName}"></h3>
+    <p th:text="|*{bankName} *{accountCode}|"></p>
+    <h5 th:text="|*{{balance}}원|"></h5>
+    <select>
+        <option>전체</option>
+        <option>입금</option>
+        <option>출금</option>
+    </select>
+
+    <div class="list-group-item mt-3"  th:each="transaction : ${transactions}">
+        <div class="row">
+            <div class="col-3">
+                <p th:text="${{transaction.transferDate}}"></p>
+                <p>나중에 이미지 넣어줄 것</p>
+            </div>
+            <div class="col-6">
+                <p th:if="${targetAccount.accountCode.equals(transaction.receiverAccountCode)}" th:text="${transaction.senderName}"></p>
+                <p th:unless="${targetAccount.accountCode.equals(transaction.receiverAccountCode)}" th:text="${transaction.receiverName}"></p>
+                <p th:text="${{transaction.transferTime}}"></p>
+            </div>
+            <div class="col-3">
+                <p class="text text-primary" th:if="${targetAccount.accountCode.equals(transaction.receiverAccountCode)}" th:text="|${{transaction.amount}}|"></p>
+                <p class="text text-danger" th:unless="${targetAccount.accountCode.equals(transaction.receiverAccountCode)}" th:text="|-${{transaction.amount}}|"></p>
+                <p th:text="${{transaction.senderAccHisBal}}"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+</html>
