@@ -37,6 +37,9 @@ public class Transaction extends BaseEntity {
     @Column(name = "sender_account_history_balance", nullable = false)
     private Long senderAccHisBal;
 
+    @Column(name = "receiver_account_history_balance", nullable = false)
+    private Long receiverAccHisBal;
+
     @Column(name = "transfer_time", nullable = false)
     private LocalDateTime transferTime;
 
@@ -44,13 +47,14 @@ public class Transaction extends BaseEntity {
     private String memo;
 
     @Builder
-    private Transaction(String senderName, String receiverName, Account senderAccount, Account receiverAccount, Long amount, Long senderAccHisBal, LocalDateTime transferTime, String memo) {
+    private Transaction(String senderName, String receiverName, Account senderAccount, Account receiverAccount, Long amount, Long senderAccHisBal, Long receiverAccHisBal, LocalDateTime transferTime, String memo) {
         this.senderName = senderName;
         this.receiverName = receiverName;
         this.senderAccount = senderAccount;
         this.receiverAccount = receiverAccount;
         this.amount = amount;
         this.senderAccHisBal = senderAccHisBal;
+        this.receiverAccHisBal = receiverAccHisBal;
         this.transferTime = transferTime;
         this.memo = memo;
     }
@@ -63,7 +67,7 @@ public class Transaction extends BaseEntity {
         // 보내는 사람의 계좌에서는 금액만큼 빼기
         Long restBalance = senderAccount.deductBalance(amount);
         // 받는 사람의 계좌에서는 금액만큼 더하기
-        receiverAccount.addBalance(amount);
+        Long newBalance = receiverAccount.addBalance(amount);
 
         Transaction transaction = Transaction.builder()
                 .senderName(senderName)
@@ -72,6 +76,7 @@ public class Transaction extends BaseEntity {
                 .receiverAccount(receiverAccount)
                 .amount(amount)
                 .senderAccHisBal(restBalance)
+                .receiverAccHisBal(newBalance)
                 .transferTime(transferTime)
                 .memo(memo)
                 .build();
@@ -85,7 +90,7 @@ public class Transaction extends BaseEntity {
         return transaction;
     }
 
-    public void changeMemo(String memo) {
+    public void updateMemo(String memo) {
         this.memo = memo;
     }
 

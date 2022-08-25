@@ -6,6 +6,7 @@ import org.springframework.format.annotation.NumberFormat;
 
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 /**
  * 송금 마지막 단계에서 필요한 폼(form)을 위한 Dto
@@ -26,10 +27,11 @@ public class TransactionFormDto {
     @NotEmpty(message = "받는 이의 계좌 번호는 반드시 필요합니다.")
     private String receiverAccountCode;
 
+    @NotNull
     @DecimalMin(value = "0", inclusive = false, message = "1원 이상은 보내야합니다.")
     @NumberFormat(pattern = "###,###")
     private Long amount;
 
     // TODO: memo 받아오기
-
+    private String memo;
 }

@@ -34,7 +34,7 @@ public class TransactionService {
         Transaction transaction = Transaction.createTransaction(
                 transactionFormDto.getSenderName(), transactionFormDto.getReceiverName(),
                 senderAccount, receiverAccount,
-                transactionFormDto.getAmount(), LocalDateTime.now(), ""
+                transactionFormDto.getAmount(), LocalDateTime.now(), transactionFormDto.getMemo()
         );
 
         transactionRepository.save(transaction);
@@ -82,6 +82,9 @@ public class TransactionService {
             transactionVo.setTransferDate(transaction.getTransferTime());
             transactionVo.setAmount(transaction.getAmount());
             transactionVo.setSenderAccHisBal(transaction.getSenderAccHisBal());
+            transactionVo.setReceiverAccHisBal(transaction.getReceiverAccHisBal());
+
+            transactionVo.setMemo(transaction.getMemo());
             result.add(transactionVo);
         }
         return result;

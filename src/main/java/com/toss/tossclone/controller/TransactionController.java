@@ -48,8 +48,8 @@ public class TransactionController {
     public String transactionFormFirst (@Valid @ModelAttribute("senderAccountDto") SenderAccountDto senderAccountDto,
                                         BindingResult bindingResult, Principal principal, Model model)
     {
-        // TODO: SenderAccountDto도 검증해주기 / sender의 경우 문제가 있으면 어떻게 처리해아할까?
         if(bindingResult.hasErrors()) {
+            //TODO: validation 오류시 어떻게 처리해줄 것인가 (나머지 컨트롤러 메서드 전부 다 생각해주기)
             return "redirect:/account/list";
         }
 
@@ -133,7 +133,7 @@ public class TransactionController {
             @Valid @ModelAttribute("transactionFormDto") TransactionFormDto transactionFormDto, BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
-            return "에러!!!";
+            return "redirect:/account/list";
         }
 
         transactionService.saveTransaction(transactionFormDto);

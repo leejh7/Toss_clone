@@ -16,8 +16,6 @@ import javax.validation.constraints.NotNull;
 @ToString
 public class ReceiverAccountDto {
 
-    // TODO: receiverName 추가해 줄 것
-
     private String bankName;
 
     @NotEmpty(message = "받는 사람의 계좌번호는 필수 입니다.")

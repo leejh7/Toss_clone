@@ -13,21 +13,25 @@
         <option>출금</option>
     </select>
 
-    <div class="list-group-item mt-3"  th:each="transaction : ${transactions}">
+    <div class="list-group-item"  th:each="transaction : ${transactions}">
         <div class="row">
             <div class="col-3">
                 <p th:text="${{transaction.transferDate}}"></p>
                 <p>나중에 이미지 넣어줄 것</p>
             </div>
-            <div class="col-6">
+            <div class="col-3">
                 <p th:if="${targetAccount.accountCode.equals(transaction.receiverAccountCode)}" th:text="${transaction.senderName}"></p>
                 <p th:unless="${targetAccount.accountCode.equals(transaction.receiverAccountCode)}" th:text="${transaction.receiverName}"></p>
                 <p th:text="${{transaction.transferTime}}"></p>
             </div>
             <div class="col-3">
+                <p th:text="${transaction.memo}"></p>
+            </div>
+            <div class="col-3">
                 <p class="text text-primary" th:if="${targetAccount.accountCode.equals(transaction.receiverAccountCode)}" th:text="|${{transaction.amount}}|"></p>
                 <p class="text text-danger" th:unless="${targetAccount.accountCode.equals(transaction.receiverAccountCode)}" th:text="|-${{transaction.amount}}|"></p>
-                <p th:text="${{transaction.senderAccHisBal}}"></p>
+                <p th:if="${targetAccount.accountCode.equals(transaction.receiverAccountCode)}" th:text="${{transaction.receiverAccHisBal}}"></p>
+                <p th:unless="${targetAccount.accountCode.equals(transaction.receiverAccountCode)}" th:text="${{transaction.senderAccHisBal}}"></p>
             </div>
         </div>
     </div>

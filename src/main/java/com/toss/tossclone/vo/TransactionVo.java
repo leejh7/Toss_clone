@@ -14,6 +14,8 @@ public class TransactionVo {
     private String senderAccountCode;
     private String receiverAccountCode;
 
+    private String memo;
+
     @DateTimeFormat(pattern = "HH:mm")
     private LocalDateTime transferTime;
 
@@ -25,4 +27,7 @@ public class TransactionVo {
 
     @NumberFormat(pattern = "###,###")
     private Long senderAccHisBal;
+
+    @NumberFormat(pattern = "###,###")
+    private Long receiverAccHisBal;
 }
