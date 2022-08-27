@@ -8,23 +8,6 @@
 <th:block layout:fragment="script">
 
     <script th:inline="javascript">
-        function makeTransaction(accountCode) {
-            alert(accountCode)
-            alert(typeof accountCode)
-
-            let form = document.createElement("form");
-            form.setAttribute("method", "post");
-            form.setAttribute("action", "/transaction/" + accountCode + "/new");
-
-            let input = document.createElement("input");
-            input.type = "hidden";
-            input.name = [[${_csrf.parameterName}]];
-            input.value = [[${_csrf.token}]];
-
-            form.appendChild(input);
-            document.body.appendChild(form);
-            form.submit();
-        }
     </script>
 
 </th:block>
@@ -44,7 +27,10 @@
         <tbody>
         <tr th:each="account : ${accounts}">
             <td th:text="${account.bank.name}"></td>
-            <td th:text="${account.name}"></td>
+            <td>
+                <a th:href="@{/transaction/all/history(accountCode=${account.accountCode})}" th:text="${account.name}"></a>
+            </td>
+
             <td th:text="${account.balance}"></td>
             <form th:action="@{/transaction/new/first}" method="post">
                 <td>

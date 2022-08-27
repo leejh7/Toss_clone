@@ -15,34 +15,58 @@
     </form>
 
     <h3 class="mt-5">내 계좌로</h3>
-    <div class="list-group w-100 mt-3">
-        <div class="list-group-item" th:each="receiverAccountDto : ${myReceiverAccountDtos}">
-            <form action="/transaction/new/last" method="post">
-                <input type="hidden" th:field="${senderAccountDto.accountCode}">
-                <input type="hidden" th:field="${senderAccountDto.accountName}">
-                <input type="hidden" th:field="${senderAccountDto.balance}">
-                <div class="row">
-                    <div class="col-3 d-flex justify-content-center align-items-center">
-                        <input type="text" class="form-control-plaintext" name="bankName" th:value="${receiverAccountDto.bankName}" readonly>
-                    </div>
-                    <div class="col-6">
-                        <input type="text" class="form-control-plaintext" name="receiverAccountName" th:value="${receiverAccountDto.receiverAccountName}" readonly>
-                        <input type="text" class="form-control-plaintext text-muted" name="receiverAccountCode" th:value="${receiverAccountDto.receiverAccountCode}" readonly>
-                    </div>
-                    <div class="col-2 d-flex justify-content-center align-items-center">
-                        <input type="hidden" name="mine" value="true">
-                        <button type="submit" class="btn btn-primary">보내기</button>
-                    </div>
-                    <div class="col-1 d-flex justify-content-center align-items-center">
-                        <i class="bi bi-star"></i>
-                    </div>
+    <div class="list-group-item" th:each="receiverAccountDto : ${myReceiverAccountDtos}">
+        <form action="/transaction/new/last" method="post">
+            <input type="hidden" th:field="${senderAccountDto.accountCode}">
+            <input type="hidden" th:field="${senderAccountDto.accountName}">
+            <input type="hidden" th:field="${senderAccountDto.balance}">
+            <div class="row">
+                <div class="col-3 d-flex justify-content-center align-items-center">
+                    <input type="text" class="form-control-plaintext" name="bankName" th:value="${receiverAccountDto.bankName}" readonly>
                 </div>
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-            </form>
-        </div>
+                <div class="col-6">
+                    <input type="text" class="form-control-plaintext" name="receiverAccountName" th:value="${receiverAccountDto.receiverAccountName}" readonly>
+                    <input type="text" class="form-control-plaintext text-muted" name="receiverAccountCode" th:value="${receiverAccountDto.receiverAccountCode}" readonly>
+                </div>
+                <div class="col-2 d-flex justify-content-center align-items-center">
+                    <input type="hidden" name="receiverName" th:value="${receiverAccountDto.receiverName}">
+                    <input type="hidden" name="mine" value="true">
+                    <button type="submit" class="btn btn-primary">보내기</button>
+                </div>
+                <div class="col-1 d-flex justify-content-center align-items-center">
+                    <i class="bi bi-star"></i>
+                </div>
+            </div>
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+        </form>
     </div>
 
     <h3 class="mt-5">최근 보낸 계좌</h3>
+    <div class="list-group-item" th:each="receiverAccountDto : ${recentReceiverAccountDtos}">
+        <form action="/transaction/new/last" method="post">
+            <input type="hidden" th:field="${senderAccountDto.accountCode}">
+            <input type="hidden" th:field="${senderAccountDto.accountName}">
+            <input type="hidden" th:field="${senderAccountDto.balance}">
+            <div class="row">
+                <div class="col-3 d-flex justify-content-center align-items-center">
+                    <input type="text" class="form-control-plaintext" name="bankName" th:value="${receiverAccountDto.bankName}" readonly>
+                </div>
+                <div class="col-6">
+                    <input type="text" class="form-control-plaintext" name="receiverName" th:value="${receiverAccountDto.receiverName}" readonly>
+                    <input type="text" class="form-control-plaintext" name="receiverAccountName" th:value="${receiverAccountDto.receiverAccountName}" readonly>
+                    <input type="text" class="form-control-plaintext text-muted" name="receiverAccountCode" th:value="${receiverAccountDto.receiverAccountCode}" readonly>
+                </div>
+                <div class="col-2 d-flex justify-content-center align-items-center">
+                    <input type="hidden" name="mine" th:value="${receiverAccountDto.mine}">
+                    <button type="submit" class="btn btn-primary">보내기</button>
+                </div>
+                <div class="col-1 d-flex justify-content-center align-items-center">
+                    <i class="bi bi-star"></i>
+                </div>
+            </div>
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+        </form>
+    </div>
 
 </div>
 

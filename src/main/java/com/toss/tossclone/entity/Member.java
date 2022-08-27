@@ -77,10 +77,10 @@ public class Member extends BaseEntity {
         this.transactionCount = 0;
     }
 
-    void minusTransactionCount() {
+    void countingTransactionCount() {
+        transactionCount++;
         if(transactionCount >= 9) {
             throw new NotEnoughTransactionCountException("수수료 무료 거래 횟수가 끝났습니다.");
         }
-        transactionCount++;
     }
 }

@@ -1,6 +1,7 @@
 package com.toss.tossclone.repository;
 
 import com.toss.tossclone.constant.TossConstant;
+import com.toss.tossclone.dao.RecentTransactionAccountDao;
 import com.toss.tossclone.dto.MemberFormDto;
 import com.toss.tossclone.entity.Account;
 import com.toss.tossclone.entity.Member;
@@ -149,13 +150,15 @@ class TransactionRepositoryTest {
         Account senderAccount = accountRepository.findAccountByAccountCode("1111-1111");
 
         // when
-        List<Account> recAccWithPaging = transactionRepository.findReceiverAccountByAccountCodeOrderByTransferTimeDesc(senderAccount.getAccountCode(), PageRequest.of(0, 3));
+        List<RecentTransactionAccountDao> results = transactionRepository.findRecentTransactionReceiverAccountByAccountCode(senderAccount.getAccountCode());
 
         printDividerLine();
 
-        for (Account account : recAccWithPaging) {
-            System.out.println("받는 사람: " + account.getName() + " 계좌번호: " + account.getAccountCode());
+
+        for (RecentTransactionAccountDao result : results) {
+            System.out.println("result = " + result);
         }
+
     }
 
     /**

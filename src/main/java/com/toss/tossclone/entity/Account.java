@@ -66,7 +66,9 @@ public class Account extends BaseEntity {
     }
 
     //==비지니스 로직==//
-    public void addBalance(Long money) {this.balance += money;}
+    public Long addBalance(Long money) {
+        return this.balance += money;
+    }
 
     public Long deductBalance(Long money) {
         Long restBalance = this.balance - money;
