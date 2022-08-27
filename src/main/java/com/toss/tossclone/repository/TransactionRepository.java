@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface TransactionRepository extends JpaRepository<Transaction, Long> {
+public interface TransactionRepository extends JpaRepository<Transaction, Long>, TransactionRepositoryCustom {
     // TODO: 페이징 적용하기 / 필요한 DAO 작성
 
     // 출금 내역 조회
@@ -33,9 +33,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     @Query(value = "select t.receiverAccount from Transaction t inner join t.senderAccount sa " +
             "where sa.accountCode =:accountCode order by t.transferTime desc")
     List<Account> findReceiverAccountByAccountCodeOrderByTransferTimeDesc(@Param("accountCode") String accountCode, Pageable pageable);
-
-
-
 
 
     // 일별 소비 총 금액 쿼리
