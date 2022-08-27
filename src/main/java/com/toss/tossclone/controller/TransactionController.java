@@ -1,22 +1,18 @@
 package com.toss.tossclone.controller;
 
-import com.toss.tossclone.dto.ReceiverAccountDto;
-import com.toss.tossclone.dto.ReceiverAccountFormDto;
-import com.toss.tossclone.dto.SenderAccountDto;
-import com.toss.tossclone.dto.TransactionFormDto;
-import com.toss.tossclone.entity.Account;
+import com.toss.tossclone.dto.*;
 import com.toss.tossclone.entity.Bank;
-import com.toss.tossclone.entity.Transaction;
 import com.toss.tossclone.repository.AccountRepository;
 import com.toss.tossclone.repository.BankRepository;
-import com.toss.tossclone.repository.TransactionRepository;
 import com.toss.tossclone.service.AccountService;
 import com.toss.tossclone.service.TransactionService;
 import com.toss.tossclone.vo.AccountVo;
 import com.toss.tossclone.vo.TransactionVo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -26,6 +22,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Controller
@@ -143,16 +140,19 @@ public class TransactionController {
 
     // --- 여기까지가 거래를 생성하기 위한 컨트롤러 메서드 --- //
 
-    @GetMapping("/all/history")
-    public String allHistory(@RequestParam String accountCode, Model model) {
+    @GetMapping(value = {"/history", "/history/{page}"})
+    public String transactionHistory(@RequestParam String accountCode, @ModelAttribute("transactionSearchDto") TransactionSearchDto transactionSearchDto, @PathVariable("page")Optional<Integer> page, Model model) {
 
-        List<TransactionVo> transactions = transactionService.findAllHistoryByAccountCode(accountCode);
+        Pageable pageable = PageRequest.of(page.orElse(0), 3);
+        Page<TransactionVo> transactions = transactionService.getTransactionPage(transactionSearchDto, pageable, accountCode);
+
         AccountVo targetAccount = accountService.findMyAccount(accountCode);
 
         model.addAttribute("targetAccount", targetAccount);
         model.addAttribute("transactions", transactions);
+        model.addAttribute("maxPage", 5);
 
-        return "transaction/allHistory";
+        return "transaction/transactionHistory";
     }
 
 }

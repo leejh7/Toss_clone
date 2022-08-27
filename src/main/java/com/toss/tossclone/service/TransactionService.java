@@ -3,6 +3,7 @@ package com.toss.tossclone.service;
 import com.toss.tossclone.dao.RecentTransactionAccountDao;
 import com.toss.tossclone.dto.ReceiverAccountDto;
 import com.toss.tossclone.dto.TransactionFormDto;
+import com.toss.tossclone.dto.TransactionSearchDto;
 import com.toss.tossclone.entity.Account;
 import com.toss.tossclone.entity.Transaction;
 import com.toss.tossclone.exception.NotEnoughMoneyException;
@@ -10,6 +11,8 @@ import com.toss.tossclone.repository.AccountRepository;
 import com.toss.tossclone.repository.TransactionRepository;
 import com.toss.tossclone.vo.TransactionVo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,27 +69,34 @@ public class TransactionService {
         return result;
     }
 
+//    // Querydsl을 적용하지 않은 방법 (페이징도 적용 X)
+//    @Transactional(readOnly = true)
+//    public List<TransactionVo> findAllHistoryByAccountCode(String accountCode) {
+//        List<Transaction> transactions = transactionRepository.findTransactionByAccountCodeOrderByTransferTimeDesc(accountCode);
+//
+//        List<TransactionVo> result = new ArrayList<>();
+//        for (Transaction transaction : transactions) {
+//            TransactionVo transactionVo = new TransactionVo();
+//            transactionVo.setSenderName(transaction.getSenderName());
+//            transactionVo.setReceiverName(transaction.getReceiverName());
+//            transactionVo.setSenderAccountCode(transaction.getSenderAccount().getAccountCode());
+//            transactionVo.setReceiverAccountCode(transaction.getReceiverAccount().getAccountCode());
+//            transactionVo.setTransferTime(transaction.getTransferTime());
+//            transactionVo.setTransferDate(transaction.getTransferTime());
+//            transactionVo.setAmount(transaction.getAmount());
+//            transactionVo.setSenderAccHisBal(transaction.getSenderAccHisBal());
+//            transactionVo.setReceiverAccHisBal(transaction.getReceiverAccHisBal());
+//
+//            transactionVo.setMemo(transaction.getMemo());
+//            result.add(transactionVo);
+//        }
+//        return result;
+//    }
+
+    // Querydsl을 적용한 방법 (페이징 적용 O)
     @Transactional(readOnly = true)
-    public List<TransactionVo> findAllHistoryByAccountCode(String accountCode) {
-        List<Transaction> transactions = transactionRepository.findTransactionByAccountCodeOrderByTransferTimeDesc(accountCode);
-
-        List<TransactionVo> result = new ArrayList<>();
-        for (Transaction transaction : transactions) {
-            TransactionVo transactionVo = new TransactionVo();
-            transactionVo.setSenderName(transaction.getSenderName());
-            transactionVo.setReceiverName(transaction.getReceiverName());
-            transactionVo.setSenderAccountCode(transaction.getSenderAccount().getAccountCode());
-            transactionVo.setReceiverAccountCode(transaction.getReceiverAccount().getAccountCode());
-            transactionVo.setTransferTime(transaction.getTransferTime());
-            transactionVo.setTransferDate(transaction.getTransferTime());
-            transactionVo.setAmount(transaction.getAmount());
-            transactionVo.setSenderAccHisBal(transaction.getSenderAccHisBal());
-            transactionVo.setReceiverAccHisBal(transaction.getReceiverAccHisBal());
-
-            transactionVo.setMemo(transaction.getMemo());
-            result.add(transactionVo);
-        }
-        return result;
+    public Page<TransactionVo> getTransactionPage(TransactionSearchDto transactionSearchDto, Pageable pageable, String targetAccountCode) {
+        return transactionRepository.getTransactionPage(targetAccountCode, transactionSearchDto, pageable);
     }
 
     private boolean isMine(List<Account> myAccounts, String receiverAccountCode) {

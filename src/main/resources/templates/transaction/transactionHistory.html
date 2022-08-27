@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+
+<!-- 사용자 스크립트 추가 -->
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+
+        $(document).ready(function(){
+            $("#searchBtn").on("click",function(e) {
+                e.preventDefault();
+                page(0);
+            });
+        });
+
+        function page(page){
+            var accountCode = [[${targetAccount.accountCode}]]
+            var searchDateType = $("#searchDateType").val();
+            var searchTransactionType = $("#searchTransactionType").val();
+            var searchBy = $("#searchBy").val();
+            var searchQuery = $("#searchQuery").val();
+
+
+            location.href="/transaction/history/" + page + "?accountCode=" + accountCode
+                + "&searchDateType=" + searchDateType
+                + "&searchTransactionType=" + searchTransactionType
+                + "&searchBy=" + searchBy
+                + "&searchQuery=" + searchQuery;
+        }
+
+    </script>
+</th:block>
+
+<!-- 사용자 CSS 추가 -->
+<th:block layout:fragment="css">
+    <style>
+        select{
+            margin-right:10px;
+        }
+    </style>
+</th:block>
+
+<div layout:fragment="content" th:object="${targetAccount}">
+    <h3 class="mt-5" th:text="*{accountName}"></h3>
+    <p th:text="|*{bankName} *{accountCode}|"></p>
+    <h5 th:text="|*{{balance}}원|"></h5>
+
+    <div class="list-group-item"  th:each="transaction : ${transactions}">
+        <div class="row">
+            <div class="col-3">
+                <p th:text="${{transaction.transferDate}}"></p>
+                <p>나중에 이미지 넣어줄 것</p>
+            </div>
+            <div class="col-3">
+                <p th:if="${targetAccount.accountCode.equals(transaction.receiverAccountCode)}" th:text="${transaction.senderName}"></p>
+                <p th:unless="${targetAccount.accountCode.equals(transaction.receiverAccountCode)}" th:text="${transaction.receiverName}"></p>
+                <p th:text="${{transaction.transferTime}}"></p>
+            </div>
+            <div class="col-3">
+                <p th:text="${transaction.memo}"></p>
+            </div>
+            <div class="col-3">
+                <p class="text text-primary" th:if="${targetAccount.accountCode.equals(transaction.receiverAccountCode)}" th:text="|${{transaction.amount}}|"></p>
+                <p class="text text-danger" th:unless="${targetAccount.accountCode.equals(transaction.receiverAccountCode)}" th:text="|-${{transaction.amount}}|"></p>
+                <p th:if="${targetAccount.accountCode.equals(transaction.receiverAccountCode)}" th:text="${{transaction.receiverAccHisBal}}"></p>
+                <p th:unless="${targetAccount.accountCode.equals(transaction.receiverAccountCode)}" th:text="${{transaction.senderAccHisBal}}"></p>
+            </div>
+        </div>
+    </div>
+
+    <div th:with="start=${(transactions.number/maxPage)*maxPage + 1}, end=(${(transactions.totalPages == 0) ? 1 : (start + (maxPage - 1) < transactions.totalPages ? start + (maxPage - 1) : transactions.totalPages)})" >
+        <ul class="pagination justify-content-center">
+
+            <li class="page-item" th:classappend="${transactions.first}?'disabled'">
+                <a th:onclick="'javascript:page(' + ${transactions.number - 1} + ')'" aria-label='Previous' class="page-link">
+                    <span aria-hidden='true'>Previous</span>
+                </a>
+            </li>
+
+            <li class="page-item" th:each="page: ${#numbers.sequence(start, end)}" th:classappend="${transactions.number eq page -1}?'active':''">
+                <a th:onclick="'javascript:page(' + ${page - 1} + ')'" th:inline="text" class="page-link">[[${page}]]</a>
+            </li>
+
+            <li class="page-item" th:classappend="${transactions.last}?'disabled'">
+                <a th:onclick="'javascript:page(' + ${transactions.number + 1} + ')'" aria-label='Next' class="page-link">
+                    <span aria-hidden='true'>Next</span>
+                </a>
+            </li>
+
+        </ul>
+    </div>
+
+    <div class="form-inline justify-content-center" th:object="${transactionSearchDto}">
+        <select th:field="*{searchDateType}" class="form-control" style="width:auto;">
+            <option value="1m">1개월</option>
+            <option value="1d">1일</option>
+            <option value="1w">1주</option>
+            <option value="3m">3개월</option>
+        </select>
+        <select th:field="*{searchTransactionType}" class="form-control" style="width:auto;">
+            <option value="">전체</option>
+            <option value="deposit">입금</option>
+            <option value="withdraw">출금</option>
+        </select>
+        <select th:field="*{searchBy}" class="form-control" style="width:auto;">
+            <option value="receiverName">받은 사람 이름</option>
+            <option value="senderName">보낸 사람 이름</option>
+        </select>
+        <input th:field="*{searchQuery}" type="text" class="form-control" placeholder="검색어를 입력해주세요">
+        <button id="searchBtn" type="submit" class="btn btn-primary">검색</button>
+    </div>
+
+
+</div>
+
+</html>

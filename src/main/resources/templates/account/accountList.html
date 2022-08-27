@@ -28,7 +28,7 @@
         <tr th:each="account : ${accounts}">
             <td th:text="${account.bank.name}"></td>
             <td>
-                <a th:href="@{/transaction/all/history(accountCode=${account.accountCode})}" th:text="${account.name}"></a>
+                <a th:href="@{/transaction/history(accountCode=${account.accountCode})}" th:text="${account.name}"></a>
             </td>
 
             <td th:text="${account.balance}"></td>

@@ -6,6 +6,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.toss.tossclone.dto.TransactionSearchDto;
 import com.toss.tossclone.entity.QTransaction;
 import com.toss.tossclone.entity.Transaction;
+import com.toss.tossclone.vo.QTransactionVo;
+import com.toss.tossclone.vo.TransactionVo;
 import org.apache.tomcat.jni.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -63,9 +65,25 @@ public class TransactionRepositoryCustomImpl implements TransactionRepositoryCus
     }
 
     @Override
-    public Page<Transaction> getTransactionPage(String targetAccountCode,TransactionSearchDto transactionSearchDto, Pageable pageable) {
-        QueryResults<Transaction> results = queryFactory
-                .selectFrom(QTransaction.transaction)
+    public Page<TransactionVo> getTransactionPage(String targetAccountCode, TransactionSearchDto transactionSearchDto, Pageable pageable) {
+        QTransaction transaction = QTransaction.transaction;
+
+        QueryResults<TransactionVo> results = queryFactory
+                .select(
+                        new QTransactionVo(
+                                transaction.senderName,
+                                transaction.receiverName,
+                                transaction.senderAccount.accountCode,
+                                transaction.receiverAccount.accountCode,
+                                transaction.memo,
+                                transaction.transferTime,
+                                transaction.transferTime,
+                                transaction.amount,
+                                transaction.senderAccHisBal,
+                                transaction.receiverAccHisBal
+                        )
+                )
+                .from(transaction)
                 .where(transferTimeAfter(transactionSearchDto.getSearchDateType()),
                         searchTransactionTypeEq(transactionSearchDto.getSearchTransactionType(), targetAccountCode),
                         searchByLike(transactionSearchDto.getSearchBy(), transactionSearchDto.getSearchQuery()))
@@ -74,7 +92,7 @@ public class TransactionRepositoryCustomImpl implements TransactionRepositoryCus
                 .limit(pageable.getPageSize())
                 .fetchResults();
 
-        List<Transaction> content = results.getResults();
+        List<TransactionVo> content = results.getResults();
         long total = results.getTotal();
         return new PageImpl<>(content,pageable,total);
     }
