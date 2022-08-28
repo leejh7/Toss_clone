@@ -12,24 +12,24 @@ import java.util.List;
 
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long>, TransactionRepositoryCustom {
-    // TODO: 페이징 적용하기 / 필요한 DAO 작성
+    // TODO: / 필요한 DAO 작성
 
-    // 출금 내역 조회
-    @Query(value = "select t from Transaction t inner join t.senderAccount sa " +
-            "where sa.accountCode =:accountCode order by t.transferTime desc ")
-    List<Transaction> findTransactionBySenderAccountCodeOrderByTransferTimeDesc(@Param("accountCode") String accountCode);
-
-    // 입금 받은 내역 조회
-    @Query(value = "select t from Transaction t inner join t.receiverAccount ra " +
-            "where ra.accountCode =:accountCode order by t.transferTime desc ")
-    List<Transaction> findTransactionByReceiverAccountCodeOrderByTransferTimeDesc(@Param("accountCode") String accountCode);
-
-    // 입금, 출금 내역 모두 조회
-    @Query(value = "select t from Transaction t inner join fetch t.senderAccount " +
-            "inner join fetch t.receiverAccount " +
-            "where t.senderAccount.accountCode =:accountCode or t.receiverAccount.accountCode =: accountCode " +
-            "order by t.transferTime desc ")
-    List<Transaction> findTransactionByAccountCodeOrderByTransferTimeDesc(@Param("accountCode") String accountCode);
+//    // 출금 내역 조회
+//    @Query(value = "select t from Transaction t inner join t.senderAccount sa " +
+//            "where sa.accountCode =:accountCode order by t.transferTime desc ")
+//    List<Transaction> findTransactionBySenderAccountCodeOrderByTransferTimeDesc(@Param("accountCode") String accountCode);
+//
+//    // 입금 받은 내역 조회
+//    @Query(value = "select t from Transaction t inner join t.receiverAccount ra " +
+//            "where ra.accountCode =:accountCode order by t.transferTime desc ")
+//    List<Transaction> findTransactionByReceiverAccountCodeOrderByTransferTimeDesc(@Param("accountCode") String accountCode);
+//
+//    // 입금, 출금 내역 모두 조회
+//    @Query(value = "select t from Transaction t inner join fetch t.senderAccount " +
+//            "inner join fetch t.receiverAccount " +
+//            "where t.senderAccount.accountCode =:accountCode or t.receiverAccount.accountCode =: accountCode " +
+//            "order by t.transferTime desc ")
+//    List<Transaction> findTransactionByAccountCodeOrderByTransferTimeDesc(@Param("accountCode") String accountCode);
 
     // 최근 보낸 계좌 조회
     // TODO: 페이징 적용하기 + 프론트단 ajax로 페이징 받아오기

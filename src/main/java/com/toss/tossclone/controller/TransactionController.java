@@ -17,8 +17,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.thymeleaf.util.StringUtils;
 
 import javax.persistence.EntityNotFoundException;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
@@ -140,8 +142,9 @@ public class TransactionController {
 
     // --- 여기까지가 거래를 생성하기 위한 컨트롤러 메서드 --- //
 
-    @GetMapping(value = {"/history", "/history/{page}"})
-    public String transactionHistory(@RequestParam String accountCode, @ModelAttribute("transactionSearchDto") TransactionSearchDto transactionSearchDto, @PathVariable("page")Optional<Integer> page, Model model) {
+    @GetMapping(value = {"/history", "/history/{page}", "/history/ajax/{page}"})
+    public String transactionHistory(@RequestParam String accountCode, @ModelAttribute("transactionSearchDto") TransactionSearchDto transactionSearchDto,
+                                     @PathVariable("page")Optional<Integer> page, Model model, HttpServletRequest request) {
 
         Pageable pageable = PageRequest.of(page.orElse(0), 3);
         Page<TransactionVo> transactions = transactionService.getTransactionPage(transactionSearchDto, pageable, accountCode);
@@ -151,6 +154,13 @@ public class TransactionController {
         model.addAttribute("targetAccount", targetAccount);
         model.addAttribute("transactions", transactions);
         model.addAttribute("maxPage", 5);
+
+        log.info("requestUrl = {}", request.getRequestURL().toString());
+        log.info("{}", StringUtils.contains(request.getRequestURL().toString(), "ajax"));
+
+        if(StringUtils.contains(request.getRequestURL().toString(), "ajax")) {
+            return "transaction/transactionHistory :: #target-div";
+        }
 
         return "transaction/transactionHistory";
     }
