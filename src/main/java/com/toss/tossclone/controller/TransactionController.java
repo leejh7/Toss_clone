@@ -33,7 +33,7 @@ import java.util.Optional;
 public class TransactionController {
 
     /**
-     * TODO: Post/Redirect/Get 다시 생각해보기 현재 PRG를 지키지 못하고 있음 지킬 수 있는 좋은 방법이 없을까?
+     * TODO: Post/Redirect/Get 다시 생각해보기 현재 PRG를 지키지 못하고 있음 지킬 수 있는 좋은 방법이 없을까? -> Ajax를 이용하는건 어떤가?
      * TODO: validation 후 error message 처리해주기
      */
 
@@ -159,6 +159,7 @@ public class TransactionController {
         log.info("{}", StringUtils.contains(request.getRequestURL().toString(), "ajax"));
 
         if(StringUtils.contains(request.getRequestURL().toString(), "ajax")) {
+            // TODO: '::'의 정확한 사용법 알아보고 코드 수정하기
             return "transaction/transactionHistory :: #target-div";
         }
 

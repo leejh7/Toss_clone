@@ -7,21 +7,14 @@
 <th:block layout:fragment="script">
     <script th:inline="javascript">
 
-        // $(document).ready(function(){
-        //     $("#searchBtn").on("click",function(e) {
-        //         e.preventDefault();
-        //         page(0);
-        //     });
-        // });
-
         // ajax 비동기 페이징
         function page(page){
-
             const accountCode = [[${targetAccount.accountCode}]];
 
             $.ajax({
                 url : "/transaction/history/ajax/" + page + "?accountCode=" + accountCode,
                 data: {
+                    // TODO: serialize 사용해보기 (이슈: input type=text 빈 문자열에 ','가 찍히는 문제)
                     searchDateType: $("#searchDateType").val(),
                     searchTransactionType: $("#searchTransactionType").val(),
                     searchBy: $("#searchBy").val(),

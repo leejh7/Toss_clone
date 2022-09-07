@@ -32,6 +32,5 @@ public class TransactionFormDto {
     @NumberFormat(pattern = "###,###")
     private Long amount;
 
-    // TODO: memo 받아오기
     private String memo;
 }
